@@ -11,18 +11,16 @@ const app = express()
 
 app.use(cors())
 app.use(bodyParser.json())
-const port = process.env.PORT || 4000
-app.listen(port, () => {
-    console.log(`listening on port: ${port}`);
-})
+// const port = process.env.PORT || 4000
+// app.listen(port, () => {
+//     console.log(`listening on port: ${port}`);
+// })
 
 
-export const handler = serverless(api);
 
 const router = Router();
 router.get("/hello", (req, res) => res.send("Hello World!"));
 
-app.use("/api/", router);
 
 
 
@@ -44,7 +42,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema)
 
-app.post('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
       const now = new Date()
       if (await User.count({ 'userEmail': req.body.email }) === 0) {
@@ -97,7 +95,7 @@ const newEntry = mongoose.model('newEntry', entrySchema)
 
 // * Code for an entry AND fetching the weather
 
-app.post('/entry/add', async (req, res) => {
+router.post('/entry/add', async (req, res) => {
   let weatherLocation ={}
   let weatherCurrent = {}
   fetch(`https://api.weatherapi.com/v1/current.json?q=London&key=${process.env.WEATHER_KEY}`)
@@ -146,7 +144,7 @@ app.post('/entry/add', async (req, res) => {
   })
 })
 
-app.get('/entry/list/:userEmail', async (req,res)=> {
+router.get('/entry/list/:userEmail', async (req,res)=> {
   const email = req.params.userEmail
   // console.log(userEmail);
   const userID = await User.findOne({userEmail: email}).select('_id')
@@ -155,13 +153,13 @@ app.get('/entry/list/:userEmail', async (req,res)=> {
   return res.json(userEntries)
 })
 
-app.get('/entry/list/edit/:entryId', async (req,res)=> {
+router.get('/entry/list/edit/:entryId', async (req,res)=> {
   const entryId = req.params.entryId
   const userEntry = await newEntry.findById(entryId)
   return res.json(userEntry)
 })
 
-app.put('/entry/list/edited/:entryId', async (req, res) => {
+router.put('/entry/list/edited/:entryId', async (req, res) => {
   try {
     const entryId = req.params.entryId
     const entryToUpdate = await newEntry.findById(entryId)
@@ -174,7 +172,7 @@ app.put('/entry/list/edited/:entryId', async (req, res) => {
   }
 })
 
-api.delete('/entry/list/delete/:entryId', async (req, res) => {
+router.delete('/entry/list/delete/:entryId', async (req, res) => {
   try {
     const entryId = req.params.entryId
     newEntry.deleteOne({'_id': entryId})
@@ -188,7 +186,11 @@ api.delete('/entry/list/delete/:entryId', async (req, res) => {
   }
 })
 
-api.get('/weather', async (req,res)=> {
+router.get('/weather', async (req,res)=> {
   const weather = await newWeather.find({})
   return res.json(weather)
 })
+
+app.use("/api/", router);
+
+export const handler = serverless(api);
