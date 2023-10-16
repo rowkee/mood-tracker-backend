@@ -191,6 +191,6 @@ router.get('/weather', async (req,res)=> {
   return res.json(weather)
 })
 
-app.use("/api", router);
+app.use("/api/", router);
 
 export const handler = serverless(app);
