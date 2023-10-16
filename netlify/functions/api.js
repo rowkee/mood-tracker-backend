@@ -4,7 +4,7 @@ import express, { Router } from "express";
 import serverless from "serverless-http";
 import cors from "cors";
 import bodyParser from "body-parser";
-import mongoose, { Schema, now } from "mongoose";
+import mongoose from "mongoose";
 import 'dotenv/config'
 
 const app = express()
