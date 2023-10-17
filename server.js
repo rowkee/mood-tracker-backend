@@ -1,7 +1,6 @@
 //* Config and Setup
 
 import express, { Router } from "express";
-import serverless from "serverless-http";
 import cors from "cors";
 import bodyParser from "body-parser";
 import mongoose, { Schema, now } from "mongoose";
@@ -17,13 +16,8 @@ app.listen(port, () => {
 })
 
 
-export const handler = serverless(api);
-
 const router = Router();
 router.get("/hello", (req, res) => res.send("Hello World!"));
-
-app.use("/api/", router);
-
 
 
 // This connects Mongoose to the project
@@ -174,7 +168,7 @@ app.put('/entry/list/edited/:entryId', async (req, res) => {
   }
 })
 
-api.delete('/entry/list/delete/:entryId', async (req, res) => {
+app.delete('/entry/list/delete/:entryId', async (req, res) => {
   try {
     const entryId = req.params.entryId
     newEntry.deleteOne({'_id': entryId})
@@ -188,7 +182,7 @@ api.delete('/entry/list/delete/:entryId', async (req, res) => {
   }
 })
 
-api.get('/weather', async (req,res)=> {
+app.get('/weather', async (req,res)=> {
   const weather = await newWeather.find({})
   return res.json(weather)
 })
